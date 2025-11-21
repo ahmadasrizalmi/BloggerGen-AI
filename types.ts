@@ -1,6 +1,13 @@
-export interface AffiliateProduct {
-  name: string;
+
+export interface ProductItem {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
   url: string;
+  cta_text: string;
+  site_name: string;
+  type: string;
 }
 
 export interface ArticleParams {
@@ -12,7 +19,9 @@ export interface ArticleParams {
   visualStyle: string;
   textColor: string;
   backgroundColor: string;
-  products: AffiliateProduct[];
+  // Affiliate Widget State
+  productWidgetHtml: string;
+  productWidgetItems: ProductItem[];
 }
 
 export interface GeneratedContent {
