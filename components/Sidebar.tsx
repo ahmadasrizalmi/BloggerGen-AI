@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { PenTool, RefreshCw, Globe, Settings, Sparkles, Palette, PaintBucket, ShoppingBag, Plus, X, Menu, ArrowRight } from 'lucide-react';
+import { PenTool, RefreshCw, Globe, Settings, Palette, PaintBucket, ShoppingBag, Plus, X, Menu, Sparkles } from 'lucide-react';
 import { ArticleParams, GenerationStatus } from '../types';
 
 interface SidebarProps {
@@ -55,7 +54,9 @@ const SidebarForm: React.FC<SidebarFormProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1"><Sparkles size={12} className="text-yellow-500"/> Target Keyword (SEO)</label>
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+            <Sparkles size={12} className="text-yellow-500"/> Target Keyword
+          </label>
           <input 
             type="text" 
             value={params.keyword}

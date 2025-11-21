@@ -40,3 +40,16 @@ export interface ToastMessage {
   type: 'success' | 'error' | 'info';
   text: string;
 }
+
+// BLOGGER TYPES
+export interface BloggerBlog {
+  id: string;
+  name: string;
+  url: string;
+}
+
+export interface BloggerPostResult {
+  id: string;
+  url: string;
+  title: string;
+}

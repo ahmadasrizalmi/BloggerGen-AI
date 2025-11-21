@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
-import { Layout, Code, Copy, Check, AlertTriangle, Type } from 'lucide-react';
+import { Layout, Code, Copy, Check, AlertTriangle, Type, Send } from 'lucide-react';
 import { Sidebar } from './components/Sidebar';
 import ProductWidgetEditor from './components/ProductWidgetEditor';
+import BloggerPublishModal from './components/BloggerPublishModal';
 import { ArticleParams, GenerationStatus, ToastMessage, ProductItem } from './types';
 import { generateBlogContent } from './services/geminiService';
 
@@ -22,12 +22,16 @@ const App = () => {
   });
 
   const [isWidgetEditorOpen, setIsWidgetEditorOpen] = useState(false);
+  const [isBloggerModalOpen, setIsBloggerModalOpen] = useState(false);
 
   const [generatedTitle, setGeneratedTitle] = useState<string>('');
   const [generatedHtml, setGeneratedHtml] = useState<string>('');
   const [status, setStatus] = useState<GenerationStatus>(GenerationStatus.IDLE);
   const [activeTab, setActiveTab] = useState<'preview' | 'html'>('preview');
   const [toast, setToast] = useState<ToastMessage | null>(null);
+
+  // BLOGGER CLIENT ID (Safe to expose for Implicit Flow, but Secret MUST NOT be here)
+  const BLOGGER_CLIENT_ID = "157169492567-mu4og7rcc93fbgjqre8n7dmbr160cb06.apps.googleusercontent.com";
 
   // --- HANDLERS ---
   const handleGenerate = async () => {
@@ -116,6 +120,16 @@ const App = () => {
         />
       )}
 
+      {/* BLOGGER PUBLISH MODAL */}
+      {isBloggerModalOpen && (
+        <BloggerPublishModal 
+          title={generatedTitle}
+          content={generatedHtml}
+          clientId={BLOGGER_CLIENT_ID}
+          onClose={() => setIsBloggerModalOpen(false)}
+        />
+      )}
+
       <div className="max-w-7xl mx-auto p-4 md:p-8 flex-grow w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
@@ -147,16 +161,23 @@ const App = () => {
             {/* Content Section */}
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col flex-grow min-h-[600px]">
                {/* Toolbar */}
-              <div className="border-b border-slate-200 flex flex-wrap items-center justify-between px-4 py-3 bg-slate-50/50">
+              <div className="border-b border-slate-200 flex flex-wrap items-center justify-between px-4 py-3 bg-slate-50/50 gap-3">
                 <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
                   <button onClick={() => setActiveTab('preview')} className={`px-4 py-2 rounded-md text-sm font-semibold flex items-center gap-2 transition-all ${activeTab === 'preview' ? 'bg-white text-slate-800 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}><Layout size={16}/> Visual</button>
                   <button onClick={() => setActiveTab('html')} className={`px-4 py-2 rounded-md text-sm font-semibold flex items-center gap-2 transition-all ${activeTab === 'html' ? 'bg-white text-blue-600 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}><Code size={16}/> Source</button>
                 </div>
-                <div className="flex gap-3 mt-3 sm:mt-0">
+                <div className="flex gap-3 mt-3 sm:mt-0 ml-auto">
                    {generatedHtml && (
                      <>
+                       <button 
+                         onClick={() => setIsBloggerModalOpen(true)} 
+                         className="px-4 py-2 bg-orange-600 text-white rounded-lg text-xs font-bold hover:bg-orange-700 flex items-center gap-2 transition-all shadow-lg shadow-orange-500/20 active:scale-95 animate-pulse-subtle"
+                       >
+                         <Send size={14}/> Publish to Blogger
+                       </button>
+                       <div className="w-px h-8 bg-slate-300 mx-1 hidden sm:block"></div>
                        <button onClick={copyFormatted} className="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg text-xs font-bold hover:bg-slate-50 flex items-center gap-2 transition-all active:scale-95"><Copy size={14}/> Copy Visual</button>
-                       <button onClick={copyHTMLCode} className="px-4 py-2 bg-slate-800 text-white rounded-lg text-xs font-bold hover:bg-slate-700 flex items-center gap-2 transition-all shadow-lg shadow-slate-900/10 active:scale-95"><Code size={14}/> Copy HTML</button>
+                       <button onClick={copyHTMLCode} className="px-4 py-2 bg-slate-800 text-white rounded-lg text-xs font-bold hover:bg-slate-700 flex items-center gap-2 transition-all shadow-lg shadow-slate-900/10 active:scale-95"><Code size={14}/> HTML</button>
                      </>
                    )}
                 </div>
