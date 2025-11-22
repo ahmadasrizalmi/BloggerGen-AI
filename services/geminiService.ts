@@ -81,14 +81,14 @@ export const generateBlogContent = async (params: ArticleParams): Promise<Genera
   }
 
   const { topic, location, tone, style, keyword, visualStyle, textColor, backgroundColor, productWidgetHtml } = params;
-
-  const isIndonesianContext = ['Indonesia', 'Jakarta', 'Bali', 'Surabaya'].includes(location) || 
-                              location.toLowerCase().includes('indonesia');
   
-  const targetLanguage = isIndonesianContext ? "Bahasa Indonesia (Indonesian)" : "English";
-  const localeInstruction = isIndonesianContext 
-    ? "Wajib menulis ARTIKEL INI SEPENUHNYA DALAM BAHASA INDONESIA yang baku dan natural." 
-    : "Write this article entirely in fluent, professional English.";
+  // STRICT ENGLISH FORCE INSTRUCTION
+  const strictLanguageInstruction = `
+    STRICT LANGUAGE RULE: 
+    You MUST write the ENTIRE content in ENGLISH.
+    Translate all context, keywords, and styling components to English.
+    Do NOT use Indonesian or any other language.
+  `;
 
   // WIDGET PLACEHOLDER LOGIC
   // We do not pass the massive HTML string to the prompt. We use a placeholder.
@@ -97,7 +97,7 @@ export const generateBlogContent = async (params: ArticleParams): Promise<Genera
     ? `
       CRITICAL INSTRUCTION:
       You must insert the exact placeholder text "[[PRODUCT_WIDGET_HERE]]" naturally within the article.
-      Best position: After the Introduction (H2 'Mengapa...' section) or before the Conclusion.
+      Best position: After the Introduction (H2) or before the Conclusion.
       Do NOT put it at the very end. Put it where a reader would likely want to buy a solution.
     ` 
     : "";
@@ -154,6 +154,45 @@ export const generateBlogContent = async (params: ArticleParams): Promise<Genera
       break;
   }
 
+  // Structure Logic for High-Ranking SEO vs Standard
+  let structureDirectives = "";
+  if (style === 'HighRankingSEO') {
+    structureDirectives = `
+      CONTENT STRUCTURE (STRICT SEO):
+      1. **Meta Data Box**: Create a visible box at the top (using inline style background: #f0fdf4; border: 1px solid #16a34a; padding: 15px; margin-bottom: 30px;) containing:
+         - <b>Title Tag</b>: (max 60 chars, includes keyword).
+         - <b>Meta Description</b>: (max 160 chars, persuasive).
+         - <b>URL Slug Suggestion</b>.
+      2. **H1 Heading**: Catchy and must include the Main Keyword.
+      3. **Introduction**: Direct hook, address user pain points, include Main Keyword in the first 100 words.
+      4. [[IMAGE_PROMPT: ...]] (Visual 1)
+      5. **Content Body**:
+         - Use H2 and H3 hierarchy logically.
+         - Max 3 sentences per paragraph (keep it scannable).
+         - MUST use Bullet points or Numbered lists in at least 2 sections.
+         - <b>Bold</b> key phrases for emphasis.
+         - Insert placeholders exactly like this: <i>[Internal Link: Suggest Topic]</i> and <i>[Image Alt Text: Description]</i> where relevant.
+      6. ${widgetInstruction}
+      7. [[IMAGE_PROMPT: ...]] (Visual 2)
+      8. **FAQ Section**: 3-5 relevant questions. Use H3 for questions.
+      9. **Conclusion & CTA**: Summary and a clear Call to Action within the Key Takeaway Box.
+      
+      TONE: Professional yet Conversational.
+    `;
+  } else {
+    // Standard Structure
+    structureDirectives = `
+      STRUCTURE:
+      1. Hook/Intro
+      2. [[IMAGE_PROMPT: ...]] (Visual 1)
+      3. Main Body (H2)
+      4. ${widgetInstruction}
+      5. Deep Dive (H3)
+      6. [[IMAGE_PROMPT: ...]] (Visual 2)
+      7. Conclusion with Key Takeaway Box
+    `;
+  }
+
   const prompt = `
     Role: You are a Senior SEO Content Scientist.
     Task: Generate a high-quality blog post for Blogger.
@@ -165,17 +204,9 @@ export const generateBlogContent = async (params: ArticleParams): Promise<Genera
     - Tone: ${tone}
     - Style: ${style}
     
-    LANGUAGE RULES:
-    1. ${localeInstruction}
+    ${strictLanguageInstruction}
     
-    STRUCTURE:
-    1. Hook/Intro
-    2. [[IMAGE_PROMPT: ...]] (Visual 1)
-    3. Main Body (H2)
-    4. ${widgetInstruction}
-    5. Deep Dive (H3)
-    6. [[IMAGE_PROMPT: ...]] (Visual 2)
-    7. Conclusion with Key Takeaway Box
+    ${structureDirectives}
 
     STYLING (Inline CSS Mandatory):
     ${styleInstructions}

@@ -105,6 +105,7 @@ const SidebarForm: React.FC<SidebarFormProps> = ({
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1"><Settings size={12}/> Style</label>
             <select value={params.style} onChange={(e) => handleChange('style', e.target.value)} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none">
+              <option value="HighRankingSEO">High-Ranking SEO 🚀</option>
               <option value="Storytelling">Storytelling</option>
               <option value="Listicle">Listicle</option>
               <option value="Review">Review</option>
